@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.io.File;
 
-public class TP03 {
+public class TP04 {
     public static void main(String[] args) throws Exception {
         // Create a Hero object to hold the hero's information for operations
         Hero token = new Hero();
@@ -36,6 +36,7 @@ public class TP03 {
         //File invertedIndex = new File("output/inverted/invertedIndex.csv");
         boolean hash = false, btree = false, inIndex = false, selectedIndex = false;
         boolean end = false;
+        char encryption = 'n';
 
         // Infinite loop to display the menu and process user inputs
         while (!end) {
@@ -47,6 +48,7 @@ public class TP03 {
             System.out.println("Type M to initiate string matching.");
             System.out.println("Type Z to compress the database.");
             System.out.println("Type Y to decompress the database.");
+            System.out.println("Type E to encrypt the database (if encrypted, type E again to decrypt it)");
             if(hash) System.out.println("Type G to see the global state of the Hash Index.");
             if(btree) System.out.println("Type G to see the global state of the BTree Index.");
             if(inIndex) System.out.println("Type T to mass search using the Inverted Index. (eg. male deceased dc)");
@@ -59,26 +61,27 @@ public class TP03 {
             if (line.charAt(0) == 'i') {
                 if(!selectedIndex) {
                     System.out.print("Are you sure you want to proceed without an index? Y/N ");
-                    if (sc.nextLine().toLowerCase().trim().charAt(0) == 'y') {
-                        System.out.print("Which encryption method do you want to use for import? V for Vigenere, D for DES: ");
-                        char encChoice = sc.nextLine().toLowerCase().trim().charAt(0);
-                        if (encChoice == 'd') db.setEncryptionModeDES(true); // DES
-                        else db.setEncryptionModeDES(false); // Vigenere
-                        db.databaseToBinary(token, false, false);
-                    } else {
+                    if (sc.nextLine().toLowerCase().trim().charAt(0) == 'y') db.databaseToBinary(token, false, false);
+                    else {
                         System.out.println("-- Operation Canceled --");
                         System.out.println();
                     }
                 } else {
-                    // Índice já escolhido
-                    System.out.print("Which encryption method do you want to use for import? V for Vigenere, D for DES: ");
-                    char encChoice = sc.nextLine().toLowerCase().trim().charAt(0);
-                    if (encChoice == 'd') db.setEncryptionModeDES(true); // DES
-                    else db.setEncryptionModeDES(false); // Vigenere
                     db.databaseToBinary(token, hash, btree);
                 }
             }
-            
+
+            // Import data from CSV into the database
+            if (line.charAt(0) == 'e') {
+                if(encryption == 'n') {
+                    System.out.print("What method would you want to use to cipher? ");
+                    encryption = sc.nextLine().toLowerCase().trim().charAt(0);
+                    db.encryptDatabase(encryption);
+                } else {
+                    db.decryptDatabase(encryption);
+                    encryption = 'n';
+                }
+            }
 
             // Compress
             else if (line.charAt(0) == 'z') {
